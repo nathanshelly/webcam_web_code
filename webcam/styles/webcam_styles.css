@@ -3,3 +3,7 @@
     border: 1px solid #CCCCCC;
     border-radius: 5px;
 }
+
+body {
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
