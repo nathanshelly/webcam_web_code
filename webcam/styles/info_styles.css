@@ -1,3 +1,21 @@
 body {
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
+
+.container {
+    margin: 100px;
+    width: 75%;
+    height: auto;
+}
+
+.container > div {
+    width: 50%;
+    
+}
+.col1 {
+    float: left;
+}
+
+.col3 {
+    margin: auto;
+}
