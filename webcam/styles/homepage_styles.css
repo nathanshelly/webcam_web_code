@@ -24,3 +24,23 @@ body {
     padding: 180px 100px;
     background: url("../images/equals.png") no-repeat center center;
 }
+
+h1 {
+    padding: 5px;
+    text-align: center;
+}
+
+h3 {
+    padding: 5px;
+    text-align: center;
+}
+
+.info_text {
+    padding: 5px;
+    text-align: center;
+}
+p {
+    padding: 5px;
+    max-width: 500px;
+    margin: auto;
+}

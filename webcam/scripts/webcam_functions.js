@@ -87,7 +87,7 @@ b.onclick = function () {
 }
 
 window.addEventListener('resize', function(){
-    img.style.width = '90%';
+    img.style.width = 'auto';
     img.style.height = 'auto';
 },true);
 
