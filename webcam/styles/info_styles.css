@@ -19,3 +19,13 @@ body {
 .col3 {
     margin: auto;
 }
+
+@media screen and (max-width:680px) {
+.container {
+    margin: 10px;
+    width: 95%;
+    height: auto
+}
+.container > div {
+    width: 100%;
+}
