@@ -7,7 +7,7 @@ var img = document.getElementById('pic');
 
 // Initialize the WebSocket
 function initWebSocket() {
-    var ipName = '10.106.10.169'; //window.location.hostname; 
+    var ipName = window.location.hostname; 
     if (ws) {
         ws.close(); // close the websocket if open.
         ws = undefined;
