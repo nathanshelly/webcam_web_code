@@ -4,6 +4,13 @@
     border-radius: 5px;
 }
 
+#pic {
+    padding: '10%';
+/*    float: right;*/
+    width = '90%';
+    height = 'auto';
+}
+
 body {
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
