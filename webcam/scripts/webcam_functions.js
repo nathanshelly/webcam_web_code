@@ -87,7 +87,7 @@ b.onclick = function () {
 }
 
 window.addEventListener('resize', function(){
-    img.style.width = '95%';
+    img.style.width = '90%';
     img.style.height = 'auto';
 },true);
 
@@ -118,6 +118,8 @@ function showLog(logArray, logId, logLimit) {
 // Define initialization function
 function init() {
     initWebSocket();
+    img.style.width = '95%';
+    img.style.height = 'auto';
 }
 
 // Open Websocket as soon as page loads
