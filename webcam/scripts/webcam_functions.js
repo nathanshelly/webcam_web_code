@@ -16,27 +16,34 @@ function initWebSocket() {
     ws.onopen = function () { // when handshake is complete:
         log('WebSocket open to ZentriOS device ' + ipName);
         //*** Change the text of the button to read "Stop Webcam" ***//
+        b.value = "Stop Webcam";
         
         //*** Change the title attribute of the button to display "Click to stop webcam" ***//
+        b.title = "Click to stop webcam";
         
         //*** Enable the button" ***//
-        
+        b.disabled = false;  
     };
 
     ws.onclose = function () { // when socket is closed:
         log('WebSocket connection to ' + ipName + ' has been closed!');
         //*** Change the text of the button to read "Start Webcam" ***//
+        b.value = "Start Webcam";
         
         //*** Change the title attribute of the button to display "Click to start webcam" ***//
+        b.title = "Click to start webcam";
         
         //*** Enable the button" ***//
-        
+        b.disabled = false;
     };
 
     ws.onmessage = function (event) { // when client receives a WebSocket message:
         //*** Display a new timestamp ***//
+        document.getElementById('timestamp').innerHTML = Date();
         
         //*** Set the source of the image to the image on the WiFi chip ***//
+        var img = document.getElementById('pic');
+        img.src = 'http://zentrios-3b9.local/image.jpg';
         
     };
 	
@@ -44,16 +51,31 @@ function initWebSocket() {
 		ws.close();
 		log('Websocket error');
         //*** Change the text of the button to read "Start Webcam" ***//
+        b.value = "Start Webcam";
 		
         //*** Change the title attribute of the button to display "Click to start webcam" ***//
-		
+		b.title = "Click to start webcam";
+        
         //*** Enable the button" ***//
+        b.disabled = false;
 		
 	}
 }
 
 // Set up event listeners
 //*** When the button is clicked, disable it, and depending on whether a Websocket is open or not, either run "initWebSocket()" or "ws.close()" ***//
+
+b.onclick = function(){
+    
+    b.disabled = true;
+    
+    if(ws.readyState == ws.OPEN){
+        ws.close();
+    }else{
+        initWebSocket();
+    }
+    
+}
 
 
 // Other functions
