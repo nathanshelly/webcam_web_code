@@ -3,8 +3,8 @@ body {
 }
 
 .container {
-    margin: 100px;
-    width: 75%;
+    margin: 10%;
+    width: 95%;
     height: auto;
 }
 
@@ -56,6 +56,14 @@ body {
     float: right;
     display: inline-block;
   }
+    .container{
+        margin: 10px;
+        width: 95%;
+        height: auto
+    }
+    .container > div {
+        width: 100%;
+    }
 }
 
 /* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. This class makes the topnav look good on small screens */
