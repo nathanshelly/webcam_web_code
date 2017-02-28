@@ -2,15 +2,10 @@ body {
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
 
-h1 {
-    margin: 2%;
-}
-
 .container {
-    margin: 2%;
+    margin: 100px;
     width: 75%;
     height: auto;
-/*    padding-bottom: 100px;*/
 }
 
 .container > div {
@@ -22,13 +17,7 @@ h1 {
 }
 
 .col3 {
-    float: right;
-}
-
-.divider{
-    width:auto;
-    height:100px;
-    display:inline-block;
+    margin: auto;
 }
 
 /*Navbar Code*/
