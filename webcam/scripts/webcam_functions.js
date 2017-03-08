@@ -27,7 +27,7 @@ function initWebSocket() {
         
         // Display the image!
         
-        img.src = 'http://zentrios-3b9.local/image.jpg';
+        img.src = 'http://zentrios-3c9.local/image.jpg';
     };
 
     ws.onclose = function () { // when socket is closed:
@@ -52,7 +52,7 @@ function initWebSocket() {
         
         //*** Set the source of the image to the image on the WiFi chip ***//
         
-        img.src = 'http://zentrios-3b9.local/image.jpg';
+        img.src = 'http://zentrios-3c9.local/image.jpg';
         
     };
 	
