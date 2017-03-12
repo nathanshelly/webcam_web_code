@@ -1,9 +1,6 @@
 body {
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-}
-
-.container {
-/*    display: inline-block;*/    
+    margin: 0px;
 }
 
 .inner_container {
@@ -25,22 +22,17 @@ body {
     background: url("../images/equals.png") no-repeat center center;
 }
 
-h1 {
+h1, h3, .info_text {
     padding: 5px;
     text-align: center;
 }
 
-h3 {
-    padding: 5px;
-    text-align: center;
-}
-
-.info_text {
-    padding: 5px;
-    text-align: center;
-}
 p {
     padding: 5px;
     max-width: 500px;
     margin: auto;
+}
+
+.home_images {
+    width: 400px;
 }
