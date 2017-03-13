@@ -69,11 +69,19 @@ function initWebSocket() {
 
 function displayImage() {
     //*** Set the source of the image to the image on the WiFi chip ***//
-    var xml_response = httpGetAsync('http://zentrios-3c9.local/image.jpg');
-    if(xml_response.status == 404)
-        img.src = 'images/big_brother_placeholder.png';
+    
+    if(imageExists('http://zentrios-3c9.local/image.jpg'))
+        img.src = 'http://zentrios-3c9.local/image.jpg';
     else
-    img.src = 'http://zentrios-3c9.local/image.jpg';
+        img.src = 'images/big_brother_placeholder.png';
+}
+
+function imageExists(image_url){
+    var http = new XMLHttpRequest();
+    http.open('HEAD', image_url, false);
+    http.send();
+
+    return http.status != 404;
 }
 
 // Set up event listeners
@@ -81,14 +89,6 @@ function displayImage() {
 b.onclick = function () {
     b.disabled = true;
     ws.readyState === ws.OPEN ? ws.close() : initWebSocket();    
-}
-
-// check if image exists
-function httpGetAsync(theUrl)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-	return xmlHttp;
 }
 
 // Other functions
