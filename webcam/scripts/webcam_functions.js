@@ -1,5 +1,5 @@
 // Variables
-var ws = undefined; // websocket instance
+var ws; // websocket instance
 var logs = [];
 var logsLimit = 4;
 var b = document.getElementById('btnWS');
@@ -7,7 +7,7 @@ var img = document.getElementById('pic');
 
 // Initialize the WebSocket
 function initWebSocket() {
-    var ipName = window.location.hostname; 
+    var ipName = window.location.hostname;
     if (ws) {
         ws.close(); // close the websocket if open.
         ws = undefined;
@@ -26,8 +26,7 @@ function initWebSocket() {
         b.disabled = false;
         
         // Display the image!
-        
-        img.src = 'http://zentrios-3c9.local/image.jpg';
+        displayImage();
     };
 
     ws.onclose = function () { // when socket is closed:
@@ -41,7 +40,7 @@ function initWebSocket() {
         //*** Enable the button" ***//
         b.disabled = false;
         
-        img.src = 'images/big_brother_cropped.png';
+        img.src = 'images/big_brother_placeholder.png';
         
         document.getElementById('timestamp').innerHTML = 'No current image';
     };
@@ -50,10 +49,8 @@ function initWebSocket() {
         //*** Display a new timestamp ***//
         document.getElementById('timestamp').innerHTML = Date();
         
-        //*** Set the source of the image to the image on the WiFi chip ***//
-        
-        img.src = 'http://zentrios-3c9.local/image.jpg';
-        
+        // Display the image!
+        displayImage();
     };
 	
 	ws.onerror = function () { // when an error occurs
@@ -67,30 +64,32 @@ function initWebSocket() {
         
         //*** Enable the button" ***//
         b.disabled = false;
-		
 	};
+}
+
+function displayImage() {
+    //*** Set the source of the image to the image on the WiFi chip ***//
+    var xml_response = httpGetAsync('http://zentrios-3c9.local/image.jpg');
+    if(xml_response.status == 404)
+        img.src = 'images/big_brother_placeholder.png';
+    else
+    img.src = 'http://zentrios-3c9.local/image.jpg';
 }
 
 // Set up event listeners
 //*** When the button is clicked, disable it, and depending on whether a Websocket is open or not, either run "initWebSocket()" or "ws.close()" ***//
-
 b.onclick = function () {
-    
     b.disabled = true;
-    
-    if (ws.readyState === ws.OPEN) {
-        ws.close();
-    }else{
-        initWebSocket();
-    }
-    
+    ws.readyState === ws.OPEN ? ws.close() : initWebSocket();    
 }
 
-window.addEventListener('resize', function(){
-    img.style.width = 'auto';
-    img.style.height = 'auto';
-},true);
-
+// check if image exists
+function httpGetAsync(theUrl)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+	return xmlHttp;
+}
 
 // Other functions
 function log(txt) {
@@ -105,9 +104,8 @@ function showLog(logArray, logId, logLimit) {
     var logContent = '';
     var logLength = logArray.length;
     var iStart = logLength - logLimit - 1;
-    if (iStart < 0) {
+    if (iStart < 0)
         iStart = 0;
-    }
     for (var index = iStart; index < logLength; ++index) {
         logItem = logArray[index];
         logContent += '<span class="' + logItem.type + '">' + logItem.content + '</span><br/>\n'
@@ -118,9 +116,11 @@ function showLog(logArray, logId, logLimit) {
 // Define initialization function
 function init() {
     initWebSocket();
+    adjust_image_width('#pic');
     img.style.width = '95%';
     img.style.height = 'auto';
 }
 
 // Open Websocket as soon as page loads
-window.addEventListener("load", init, false);
+window.onload = init;
+window.addEventListener('resize', adjust_image_width('#pic'));

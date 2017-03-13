@@ -37,3 +37,18 @@ function getCSSRule(ruleName, deleteFlag) {               // Return requested st
    }                                                      // end styleSheet ability check
    return false;                                          // we found NOTHING!
 }                                                         // end getCSSRule 
+
+var adjust_image_width = function(css_selector){
+    var css_rule = getCSSRule(css_selector);
+    var w  = window,
+    d  = w.document,
+    de = d.documentElement,
+    db = d.body || d.getElementsByTagName('body')[0],
+    x  = w.innerWidth || de.clientWidth || db.clientWidth,
+    y  = w.innerHeight|| de.clientHeight|| db.clientHeight;
+
+    if(!!navigator.userAgent.match(/iphone|android|blackberry/ig) && x < 450)
+        css_rule.style.width = '90%'; 
+    else
+        css_rule.style.width = 'auto';
+};
