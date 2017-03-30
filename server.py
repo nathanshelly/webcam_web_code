@@ -17,13 +17,13 @@ class socket(websocket.WebSocketHandler):
 	def on_close(self):
 		print 'websocket closed'
 
-	def make_app():
-		handlers = [(r"/ws", socket)]
-		return tornado.web.Application(handlers)
+def make_app():
+	handlers = [(r"/ws", socket)]
+	return tornado.web.Application(handlers)
 
-	if __name__ == "__main__":
-		enable_pretty_logging()
-		app = make_app()
-		# app.listen(443, ssl_options={"certfile": "map.crt", "keyfile": "map.key", })
-		app.listen(8000, address='127.0.0.1')
-		tornado.ioloop.IOLoop.current().start()
+if __name__ == "__main__":
+	enable_pretty_logging()
+	app = make_app()
+	# app.listen(443, ssl_options={"certfile": "map.crt", "keyfile": "map.key", })
+	app.listen(8000, address='127.0.0.1')
+	tornado.ioloop.IOLoop.current().start()
