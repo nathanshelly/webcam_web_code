@@ -12,7 +12,7 @@ function initWebSocket() {
         ws.close(); // close the websocket if open.
         ws = undefined;
     }
-    ws = new WebSocket('ws://' + ipName + '/stream');
+    ws = new WebSocket('ws://' + ipName + '/ws');
 
     ws.onopen = function () { // when handshake is complete:
         log('WebSocket open to ZentriOS device ' + ipName);
@@ -69,19 +69,7 @@ function initWebSocket() {
 
 function displayImage() {
     //*** Set the source of the image to the image on the WiFi chip ***//
-    
-    if(imageExists('http://zentrios-3c9.local/image.jpg'))
-        img.src = 'http://zentrios-3c9.local/image.jpg';
-    else
-        img.src = 'images/big_brother_placeholder.png';
-}
-
-function imageExists(image_url){
-    var http = new XMLHttpRequest();
-    http.open('HEAD', image_url, false);
-    http.send();
-
-    return http.status != 404;
+    img.src = 'images/big_brother_placeholder.png';
 }
 
 // Set up event listeners
