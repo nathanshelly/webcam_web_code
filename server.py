@@ -17,8 +17,12 @@ class socket(websocket.WebSocketHandler):
 	def on_close(self):
 		print 'websocket closed'
 
+class post_test(web.RequestHandler):
+	def post(self):
+		print self.get_body_argument("message")
+
 def make_app():
-	handlers = [(r"/ws", socket)]
+	handlers = [(r"/ws", socket), (r"/post_test", )]
 	return tornado.web.Application(handlers)
 
 if __name__ == "__main__":
