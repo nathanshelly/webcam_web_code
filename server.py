@@ -19,10 +19,11 @@ class socket(websocket.WebSocketHandler):
 
 class post_test(tornado.web.RequestHandler):
 	def post(self):
+		print 'hi'
 		print self.get_body_argument("message")
 
 def make_app():
-	handlers = [(r"/ws", socket), (r"/post_test", )]
+	handlers = [(r"/ws", socket), (r"/post_test", post_test)]
 	return tornado.web.Application(handlers)
 
 if __name__ == "__main__":
