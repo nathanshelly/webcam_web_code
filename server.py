@@ -17,7 +17,7 @@ class socket(websocket.WebSocketHandler):
 	def on_close(self):
 		print 'websocket closed'
 
-class post_test(web.RequestHandler):
+class post_test(tornado.web.RequestHandler):
 	def post(self):
 		print self.get_body_argument("message")
 
