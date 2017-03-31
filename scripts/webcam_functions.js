@@ -12,10 +12,10 @@ function initWebSocket() {
         ws.close(); // close the websocket if open.
         ws = undefined;
     }
-    ws = new WebSocket('ws://' + ipName + '/ws');
+    ws = new WebSocket('wss://' + ipName + '/ws');
 
     ws.onopen = function () { // when handshake is complete:
-        log('WebSocket open to ZentriOS device ' + ipName);
+        log('WebSocket open to ' + ipName);
         //*** Change the text of the button to read "Stop Webcam" ***//
         b.innerHTML = "Stop Webcam";
         
