@@ -48,6 +48,8 @@ function initWebSocket() {
     ws.onmessage = function (event) { // when client receives a WebSocket message:
         //*** Display a new timestamp ***//
         document.getElementById('timestamp').innerHTML = Date();
+
+				console.log(event);
         
         // Display the image!
         displayImage();
@@ -69,7 +71,8 @@ function initWebSocket() {
 
 function displayImage() {
     //*** Set the source of the image to the image on the WiFi chip ***//
-    img.src = 'images/big_brother_placeholder.png';
+		var d = new Date();	
+    img.src = 'images/cam_feed.jpg' + '?dummy=' + d.getTime();
 }
 
 // Set up event listeners
