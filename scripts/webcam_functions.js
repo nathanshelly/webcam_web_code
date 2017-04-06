@@ -12,7 +12,7 @@ function initWebSocket() {
         ws.close(); // close the websocket if open.
         ws = undefined;
     }
-    ws = new WebSocket('wss://' + ipName + '/ws');
+    ws = new WebSocket('wss://' + ipName + '/camera_socket');
 
     ws.onopen = function () { // when handshake is complete:
         log('WebSocket open to ' + ipName);

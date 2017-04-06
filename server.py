@@ -22,6 +22,22 @@ class socket(websocket.WebSocketHandler):
 		sockets.remove(self)
 		print 'websocket closed'
 
+class source_audio_socket(websocket.WebSocketHandler):    
+	def check_origin(self, origin):
+		return True
+
+	def open(self):
+		sockets.append(self)
+		print 'audio socket to source opened'
+
+	def on_message(self, message):
+		if message:
+			print message
+
+	def on_close(self):
+		sockets.remove(self)
+		print 'audio socket to source closed'
+
 class post_image(tornado.web.RequestHandler):
 	def post(self):
 		body = self.request.body
@@ -39,7 +55,7 @@ class post_image(tornado.web.RequestHandler):
 			print "No image sent"
 
 def make_app():
-	handlers = [(r"/ws", socket), (r"/post_image", post_image)]
+	handlers = [(r"/camera_socket", socket), (r"/source_audio_socket", source_audio_socket), (r"/post_image", post_image)]
 	return tornado.web.Application(handlers)
 
 if __name__ == "__main__":
