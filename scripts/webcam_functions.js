@@ -71,8 +71,8 @@ function initWebSocket() {
 
 function displayImage() {
     //*** Set the source of the image to the image on the WiFi chip ***//
-		var d = new Date();	
-    img.src = 'images/cam_feed.jpg' + '?dummy=' + d.getTime();
+	var d = new Date();	
+	img.src = 'images/cam_feed.jpg' + '?dummy=' + d.getTime();
 }
 
 // Set up event listeners
