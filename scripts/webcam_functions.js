@@ -1,72 +1,76 @@
 // Variables
-var ws; // websocket instance
+var cam_socket; // camera socket instance
+var aud_socket; // audio socket instance
 var logs = [];
 var logsLimit = 4;
 var b = document.getElementById('btnWS');
 var img = document.getElementById('pic');
 
-// Initialize the WebSocket
-function initWebSocket() {
-    var ipName = window.location.hostname;
-    if (ws) {
-        ws.close(); // close the websocket if open.
-        ws = undefined;
-    }
-    ws = new WebSocket('wss://' + ipName + '/camera_socket');
+// Initialize sockets
+function initSockets() {
+    var host_url = window.location.hostname;
+    if (cam_socket)
+        cam_socket.close(); // close the websocket if open.
+    if (aud_socket)
+        aud_socket.close(); // close the websocket if open.
 
-    ws.onopen = function () { // when handshake is complete:
-        log('WebSocket open to ' + ipName);
-        //*** Change the text of the button to read "Stop Webcam" ***//
-        b.innerHTML = "Stop Webcam";
+    cam_socket = new WebSocket('wss://' + host_url + '/camera_socket');
+    aud_socket = new WebSocket('wss://' + host_url + '/audio_socket');
+
+    cam_socket.onopen = function () { 
+				logAndUpdateButton('Sockets open to ' + host_url, 'Stop webcam', 'Click to stop webcam', false);
         
-        //*** Change the title attribute of the button to display "Click to stop webcam" ***//
-        b.title = "Click to stop webcam";
-        
-        //*** Enable the button" ***//
-        b.disabled = false;
-        
-        // Display the image!
+        // display image!
         displayImage();
     };
 
-    ws.onclose = function () { // when socket is closed:
-        log('WebSocket connection to ' + ipName + ' has been closed!');
-        //*** Change the text of the button to read "Start Webcam" ***//
-        b.innerHTML = "Start Webcam";
-        
-        //*** Change the title attribute of the button to display "Click to start webcam" ***//
-        b.title = "Click to start webcam";
-        
-        //*** Enable the button" ***//
-        b.disabled = false;
+    cam_socket.onclose = function () { 
+				logAndUpdateButton('Sockets to ' + host_url + 'closed', 'Start webcam', 'Click to start webcam', false);
         
         img.src = 'images/big_brother_placeholder.png';
-        
         document.getElementById('timestamp').innerHTML = 'No current image';
     };
 
-    ws.onmessage = function (event) { // when client receives a WebSocket message:
-        //*** Display a new timestamp ***//
+    cam_socket.onmessage = function (event) {
         document.getElementById('timestamp').innerHTML = Date();
-
 				console.log(event);
         
         // Display the image!
         displayImage();
     };
 	
-	ws.onerror = function () { // when an error occurs
-		ws.close();
-		log('Websocket error');
-        //*** Change the text of the button to read "Start Webcam" ***//
-        b.innerHTML = "Start Webcam";
-		
-        //*** Change the title attribute of the button to display "Click to start webcam" ***//
-		b.title = "Click to start webcam";
-        
-        //*** Enable the button" ***//
-        b.disabled = false;
+	cam_socket.onerror = function () {
+		cam_socket.close();
+		logAndUpdateButton('Websocket error', 'Start webcam', 'Click to start webcam', false);
 	};
+
+	aud_socket.onopen = function () { 
+		// placeholder
+		console.log('Audio socket open');
+	};
+
+	aud_socket.onclose = function () { 
+		// placeholder
+		console.log('Audio socket closed');
+	};
+
+	aud_socket.onmessage = function (event) {
+		// placeholder
+		console.log('Audio socket message');
+	};
+
+	aud_socket.onerror = function () {
+		aud_socket.close();
+		// placeholder
+		console.log('Audio socket error');
+	};
+}
+
+function logAndUpdateButton(new_log_msg, new_btn_txt, new_btn_title, btn_status) {
+		log(new_log_msg);
+		b.innerHTML = new_btn_txt;
+		b.title = new_btn_title;
+		b.disabled = btn_status;
 }
 
 function displayImage() {
@@ -76,10 +80,10 @@ function displayImage() {
 }
 
 // Set up event listeners
-//*** When the button is clicked, disable it, and depending on whether a Websocket is open or not, either run "initWebSocket()" or "ws.close()" ***//
+//*** When the button is clicked, disable it, and depending on whether a Websocket is open or not, either run "initSockets()" or "cam_socket.close()" ***//
 b.onclick = function () {
     b.disabled = true;
-    ws.readyState === ws.OPEN ? ws.close() : initWebSocket();    
+    cam_socket.readyState === ws.OPEN ? ws.close() : initSockets();    
 }
 
 // Other functions
@@ -106,7 +110,7 @@ function showLog(logArray, logId, logLimit) {
 
 // Define initialization function
 function init() {
-    initWebSocket();
+    initSockets();
     adjust_image_width('#pic');
     img.style.width = '95%';
     img.style.height = 'auto';
