@@ -17,16 +17,16 @@ function initSockets() {
     cam_socket = new WebSocket('wss://' + host_url + '/camera_socket');
     aud_socket = new WebSocket('wss://' + host_url + '/audio_socket');
 
-    cam_socket.onopen = function () { 
+    cam_socket.onopen = function () {
 				logAndUpdateButton('Sockets open to ' + host_url, 'Stop webcam', 'Click to stop webcam', false);
-        
+
         // display image!
         displayImage();
     };
 
-    cam_socket.onclose = function () { 
+    cam_socket.onclose = function () {
 				logAndUpdateButton('Sockets to ' + host_url + 'closed', 'Start webcam', 'Click to start webcam', false);
-        
+
         img.src = 'images/big_brother_placeholder.png';
         document.getElementById('timestamp').innerHTML = 'No current image';
     };
@@ -34,11 +34,11 @@ function initSockets() {
     cam_socket.onmessage = function (event) {
         document.getElementById('timestamp').innerHTML = Date();
 				console.log(event);
-        
+
         // Display the image!
         displayImage();
     };
-	
+
 	cam_socket.onerror = function () {
 		cam_socket.close();
 		logAndUpdateButton('Websocket error', 'Start webcam', 'Click to start webcam', false);
@@ -54,8 +54,32 @@ function initSockets() {
 		console.log('Audio socket closed');
 	};
 
-	aud_socket.onmessage = function (event) {
+	aud_socket.onmessage = function (message) {
 		// placeholder
+		if (message){
+			console.log('message received');
+			var data_json = JSON.parse(message.data);
+			if(data_json['type'] == 'audio-array'){
+				var audio_array = data_json['array'];
+				var dataview = encodeWAV(audio_array);
+				var audio_blob = new Blob([dataview], {type: 'audio/wav'});
+				var url = URL.createObjectURL(audio_blob);
+				var li = document.createElement('li');
+				var au = document.createElement('audio');
+
+				au.controls = true;
+				au.src = url;
+				li.appendChild(au);
+				if (recordings_list.childElementCount > 0){
+					recordings_list.replaceChild(li, recordings_list.childNodes[0])
+				}else{
+					recordings_list.appendChild(li);
+				}
+			}
+			else{
+				console.log('unknown message type');
+			}
+		}
 		console.log('Audio socket message');
 	};
 
@@ -77,6 +101,38 @@ function displayImage() {
     //*** Set the source of the image to the image on the WiFi chip ***//
 	var d = new Date();	
 	img.src = 'images/cam_feed.jpg' + '?dummy=' + d.getTime();
+}
+
+function writeString(view, offset, string){
+	for (var i  = 0; i < string.length; i++){
+		view.setUint8(offset+i, string.charCodeAt(i));
+	}
+}
+
+function encodeWAV(samples){
+	var buffer = new ArrayBuffer(44 + samples.length *2);
+	var view = new DataView(buffer);
+	sample_rate = 32000;
+
+	writeString(view, 0, 'RIFF');
+	view.setUint32(4, 36+samples.length*2,true);
+	writeString(view, 8, 'WAVE');
+	writeString(view, 12, 'fmt ');
+	view.setUint32(16, 16, true);
+	view.setUint16(20, 1, true);
+	view.setUint16(22, 1, true);
+	view.setUint32(24, sample_rate, true);
+	view.setUint32(28, sample_rate*4, true);
+	view.setUint16(32, 2, true);
+	view.setUint16(34, 16, true);
+	writeString(view, 36, 'data');
+	view.setUint32(40, samples.length*2, true);
+	var offset = 44;
+	for (var i=0; i< samples.length; i++, offset += 2){
+		view.setInt16(offset, samples[i], true);
+	}
+
+	return view;
 }
 
 // Set up event listeners
