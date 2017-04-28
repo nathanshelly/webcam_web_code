@@ -2,6 +2,7 @@ import tornado.ioloop, tornado.web, json, base64, numpy as np
 from tornado.log import enable_pretty_logging
 from tornado import websocket
 from array import array
+from datetime import datetime
 
 cam_sockets = []
 browser_audio_sockets = []
@@ -48,33 +49,31 @@ class aud_socket(websocket.WebSocketHandler):
 		browser_audio_sockets.remove(self)
 		print 'audio stream closed'
 
-class source_audio_socket(websocket.WebSocketHandler):    
+class source_audio_socket(websocket.WebSocketHandler):
 	def check_origin(self, origin):
 		return True
 
 	def open(self):
 		print 'audio socket to source opened'
+		audio_packet_list = []
 
 	def on_message(self, message):
-		print 'message testing'
-		print message
 		if message:
-			print 'Message received:'
-			print message
-			print 'Message length: ', len(message)
-			audio_array = np.frombuffer(message, dtype=np.int16)
-			# f = open("temp.bin","wb")
-			# f.write(message)
-			# f.close()
-			#audio_array = np.fromfile("temp.bin", dtype=uint16, count=10)
-			#print audio_array
-			#hex_list = [ord(elem) for elem in message]
-			#audio_chunk = array('h', hex_list)
-			#print audio_chunk
-			#for character in message:
-			#	audio_buffer.append(int(character))
-			#print 'Current audio buffer: '
-			#print audio_buffer
+			global audio_packet_list
+			if len(audio_packet_list) > 200: 
+				print "received termination request"
+				print str(datetime.now())
+				audio_array = np.concatenate(audio_packet_list)
+				to_send = {'type':'audio-array','array':audio_array.tolist()}
+				for socket in browser_audio_sockets:
+					socket.write_message(json.dumps(to_send))
+					print "sent audio data"
+				audio_packet_list = []
+			else: #if message['type'] == "audio data":
+				print "packets recieved: ", len(audio_packet_list) 
+				audio_packet = np.frombuffer(message, dtype=np.uint16)
+				audio_packet_list.append(audio_packet)
+				# print audio_packet
 
 	def on_close(self):
 		print 'audio socket to source closed'
@@ -89,39 +88,6 @@ class post_image(tornado.web.RequestHandler):
 			f.close()
 			for websocket in cam_sockets:
 				websocket.write_message('hi')
-		elif self.request.headers["message-type"] == "audio-term":
-			print "Received Termination Request"
-			global audio_packet_list
-			audio_array = np.concatenate(audio_packet_list)
-			to_send = {'type':'audio-array','array':audio_array.tolist()}
-			f = open("temp.bin","wb")
-			f.write(audio_array)
-			f.close()
-			print browser_audio_sockets
-			for socket in browser_audio_sockets:
-				socket.write_message(json.dumps(to_send))
-				print "Sent audio data"
-			audio_packet_list = []
-		elif self.request.headers["message-type"] == "audio-bin":
-			print 'got audio'
-			#f = open("temp.bin","wb")
-			#f.write(body)
-			#f.close()
-			#print 'File written'
-			#audio_array = np.fromfile("temp.bin", dtype=np.int16)
-			#print "Audio array from file"
-			#print audio_array
-			global audio_packet_list
-			print "Packets recieved: ", len(audio_packet_list)
-			#print audio_packet_list
-			audio_packet = np.frombuffer(body, dtype=np.int16)
-			audio_packet_list.append(audio_packet)
-			print "Good Audio from post"
-			#print audio_array
-			#barr = bytearray(body)
-			#print "file written"
-		elif self.request.headers["message-type"] == "test":
-			print body
 		else:
 			print "No image sent"
 

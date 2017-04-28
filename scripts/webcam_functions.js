@@ -25,7 +25,7 @@ function initSockets() {
     };
 
     cam_socket.onclose = function () {
-				logAndUpdateButton('Sockets to ' + host_url + 'closed', 'Start webcam', 'Click to start webcam', false);
+				logAndUpdateButton('Sockets to ' + host_url + ' closed', 'Start webcam', 'Click to start webcam', false);
 
         img.src = 'images/big_brother_placeholder.png';
         document.getElementById('timestamp').innerHTML = 'No current image';
@@ -112,7 +112,7 @@ function writeString(view, offset, string){
 function encodeWAV(samples){
 	var buffer = new ArrayBuffer(44 + samples.length *2);
 	var view = new DataView(buffer);
-	sample_rate = 32000;
+	sample_rate = 8000;
 
 	writeString(view, 0, 'RIFF');
 	view.setUint32(4, 36+samples.length*2,true);
