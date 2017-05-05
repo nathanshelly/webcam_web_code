@@ -55,12 +55,13 @@ class source_audio_socket(websocket.WebSocketHandler):
 
 	def open(self):
 		print 'audio socket to source opened'
+		global audio_packet_list
 		audio_packet_list = []
 
 	def on_message(self, message):
 		if message:
 			global audio_packet_list
-			if len(audio_packet_list) > 200: 
+			if len(audio_packet_list) > 800:
 				print "received termination request"
 				print str(datetime.now())
 				audio_array = np.concatenate(audio_packet_list)
@@ -71,9 +72,10 @@ class source_audio_socket(websocket.WebSocketHandler):
 				audio_packet_list = []
 			else: #if message['type'] == "audio data":
 				print "packets recieved: ", len(audio_packet_list) 
+				# audio_packet = np.frombuffer(message, dtype=np.uint8) * 2**8
 				audio_packet = np.frombuffer(message, dtype=np.uint16)
 				audio_packet_list.append(audio_packet)
-				# print audio_packet
+				#print audio_packet
 
 	def on_close(self):
 		print 'audio socket to source closed'

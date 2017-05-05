@@ -112,7 +112,7 @@ function writeString(view, offset, string){
 function encodeWAV(samples){
 	var buffer = new ArrayBuffer(44 + samples.length *2);
 	var view = new DataView(buffer);
-	sample_rate = 8000;
+	sample_rate = 16000;
 
 	writeString(view, 0, 'RIFF');
 	view.setUint32(4, 36+samples.length*2,true);
