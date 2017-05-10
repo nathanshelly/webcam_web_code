@@ -46,6 +46,7 @@ function initSockets() {
 
 	aud_socket.onopen = function () { 
 		console.log('Audio socket open');
+		var audio_context = new AudioContext();
 	};
 
 	aud_socket.onclose = function () { 
@@ -53,29 +54,22 @@ function initSockets() {
 	};
 
 	aud_socket.onmessage = function (message) {
-		if (message){
-			console.log('message received');
+		if (message) {
 			var data_json = JSON.parse(message.data);
-			if(data_json['type'] == 'audio-array'){
+			if(data_json['type'] == 'audio-array') {
 				var audio_array = data_json['array'];
-				var dataview = encodeWAV(audio_array);
-				var audio_blob = new Blob([dataview], {type: 'audio/wav'});
-				var url = URL.createObjectURL(audio_blob);
-				var li = document.createElement('li');
-				var au = document.createElement('audio');
+				let audio_buffer = audio_context.createBuffer(1, 200, 16000);
+				audio_buffer.getChannelData(0).set(audio_array);
 
-				au.controls = true;
-				au.src = url;
-				li.appendChild(au);
-				if (recordings_list.childElementCount > 0){
-					recordings_list.replaceChild(li, recordings_list.childNodes[0])
-				}else{
-					recordings_list.appendChild(li);
-				}
+				let source = audio_context.createBufferSource();
+				source.buffer = audio_buffer;
+				source.start(start_time);
+				source.connect(audio_context.destination);
+
+				start_time += audio_buffer.duration;
 			}
-			else{
+			else
 				console.log('unknown message type');
-			}
 		}
 		console.log('Audio socket message');
 	};

@@ -62,15 +62,16 @@ class source_audio_socket(websocket.WebSocketHandler):
 		if message:
 			global audio_packet_list
 
-			if len(audio_packet_list) > 800:
-				print "received termination request"
-				print str(datetime.now())
-				audio_array = np.concatenate(audio_packet_list)
-				to_send = {'type':'audio-array','array':audio_array.tolist()}
+			if True:
+				# print "received termination request"
+				# print str(datetime.now())
+				# audio_array = np.concatenate(audio_packet_list)
+				audio_packet = np.frombuffer(message, dtype=np.uint16)
+
+				to_send = {'type': 'audio-array','array': audio_packet.tolist()}
 				for socket in browser_audio_sockets:
 					socket.write_message(json.dumps(to_send))
 					print "sent audio data"
-				audio_packet_list = []
 			else:
 				print "packets recieved: ", len(audio_packet_list) 
 				audio_packet = np.frombuffer(message, dtype=np.uint16)
