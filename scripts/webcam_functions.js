@@ -45,17 +45,14 @@ function initSockets() {
 	};
 
 	aud_socket.onopen = function () { 
-		// placeholder
 		console.log('Audio socket open');
 	};
 
 	aud_socket.onclose = function () { 
-		// placeholder
 		console.log('Audio socket closed');
 	};
 
 	aud_socket.onmessage = function (message) {
-		// placeholder
 		if (message){
 			console.log('message received');
 			var data_json = JSON.parse(message.data);

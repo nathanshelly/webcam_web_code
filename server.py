@@ -61,6 +61,7 @@ class source_audio_socket(websocket.WebSocketHandler):
 	def on_message(self, message):
 		if message:
 			global audio_packet_list
+
 			if len(audio_packet_list) > 800:
 				print "received termination request"
 				print str(datetime.now())
@@ -70,12 +71,10 @@ class source_audio_socket(websocket.WebSocketHandler):
 					socket.write_message(json.dumps(to_send))
 					print "sent audio data"
 				audio_packet_list = []
-			else: #if message['type'] == "audio data":
+			else:
 				print "packets recieved: ", len(audio_packet_list) 
-				# audio_packet = np.frombuffer(message, dtype=np.uint8) * 2**8
 				audio_packet = np.frombuffer(message, dtype=np.uint16)
 				audio_packet_list.append(audio_packet)
-				#print audio_packet
 
 	def on_close(self):
 		print 'audio socket to source closed'
@@ -98,7 +97,6 @@ def make_app():
 	return tornado.web.Application(handlers)
 
 if __name__ == "__main__":
-	#global audio_packet_list
 	enable_pretty_logging()
 	app = make_app()
 	app.listen(8000, address='127.0.0.1')
