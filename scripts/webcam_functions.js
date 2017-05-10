@@ -47,6 +47,22 @@ function initSockets() {
 	aud_socket.onopen = function () { 
 		console.log('Audio socket open');
 		var audio_context = new AudioContext();
+		let start_time = 0;	
+		let audio_array = [];
+		for(let i = 0; i < 16000; i++) {
+			audio_array.push(2*Math.PI*440 * (i/16000));
+		}
+		for(let j = 0; j < 5; j++) {
+			let audio_buffer = audio_context.createBuffer(1, 16000, 16000);
+			audio_buffer.getChannelData(0).set(audio_array);
+
+			let source = audio_context.createBufferSource();
+			source.buffer = audio_buffer;
+			source.start(start_time);
+			source.connect(audio_context.destination);
+
+			start_time += audio_buffer.duration;
+		}
 	};
 
 	aud_socket.onclose = function () { 
@@ -54,7 +70,7 @@ function initSockets() {
 	};
 
 	aud_socket.onmessage = function (message) {
-		if (message) {
+		if (!message) {
 			var data_json = JSON.parse(message.data);
 			if(data_json['type'] == 'audio-array') {
 				var audio_array = data_json['array'];
