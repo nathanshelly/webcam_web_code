@@ -5,6 +5,9 @@ var logs = [];
 var logsLimit = 4;
 var b = document.getElementById('btnWS');
 var img = document.getElementById('pic');
+var start_time = 0;
+var audio_context = new AudioContext();
+var audio_array = [];
 
 // Initialize sockets
 function initSockets() {
@@ -46,13 +49,13 @@ function initSockets() {
 
 	aud_socket.onopen = function () { 
 		console.log('Audio socket open');
-		var audio_context = new AudioContext();
-		let start_time = 0;	
+	/*	var audio_context = new AudioContext();
+		let start_time = 0;
 		let audio_array = [];
 		for(let i = 0; i < 16000; i++) {
-			audio_array.push(2*Math.PI*440 * (i/16000));
+			audio_array.push(20*Math.sin(2*Math.PI*440 * (i/16000)));
 		}
-		for(let j = 0; j < 5; j++) {
+		 for(let j = 0; j < 5; j++) {
 			let audio_buffer = audio_context.createBuffer(1, 16000, 16000);
 			audio_buffer.getChannelData(0).set(audio_array);
 
@@ -62,7 +65,7 @@ function initSockets() {
 			source.connect(audio_context.destination);
 
 			start_time += audio_buffer.duration;
-		}
+		}*/
 	};
 
 	aud_socket.onclose = function () { 
@@ -70,11 +73,14 @@ function initSockets() {
 	};
 
 	aud_socket.onmessage = function (message) {
-		if (!message) {
+		if (message) {
 			var data_json = JSON.parse(message.data);
+			
 			if(data_json['type'] == 'audio-array') {
-				var audio_array = data_json['array'];
-				let audio_buffer = audio_context.createBuffer(1, 200, 16000);
+				if(start_time === 0)
+					start_time = audio_context.currentTime
+				audio_array = data_json['array'];
+				let audio_buffer = audio_context.createBuffer(1, 8000, 16000);
 				audio_buffer.getChannelData(0).set(audio_array);
 
 				let source = audio_context.createBufferSource();

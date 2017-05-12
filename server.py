@@ -37,7 +37,7 @@ class aud_socket(websocket.WebSocketHandler):
 		a = np.concatenate((a,a,a,a,a,a))
 		print len(a)
 		to_send = {'type':'audio-array', 'array': a.tolist()}
-		self.write_message(json.dumps(to_send))
+		# self.write_message(json.dumps(to_send))
 		print "Sent audio data"
 
 	def on_message(self, message):
@@ -62,20 +62,19 @@ class source_audio_socket(websocket.WebSocketHandler):
 		if message:
 			global audio_packet_list
 
-			if True:
-				# print "received termination request"
-				# print str(datetime.now())
-				# audio_array = np.concatenate(audio_packet_list)
-				audio_packet = np.frombuffer(message, dtype=np.uint16)
+			if len(audio_packet_list) == 40:
+				print "received termination request"
+				print str(datetime.now())
+				audio_array = np.concatenate(audio_packet_list)
 
-				to_send = {'type': 'audio-array','array': audio_packet.tolist()}
+				to_send = {'type': 'audio-array','array': audio_array.tolist()}
 				for socket in browser_audio_sockets:
 					socket.write_message(json.dumps(to_send))
 					print "sent audio data"
-			else:
-				print "packets recieved: ", len(audio_packet_list) 
-				audio_packet = np.frombuffer(message, dtype=np.uint16)
-				audio_packet_list.append(audio_packet)
+				audio_packet_list = []
+			print "packets recieved: ", len(audio_packet_list) 
+			audio_packet = ((np.frombuffer(message, dtype=np.uint16)/2.0**15)-1.75)*4
+			audio_packet_list.append(audio_packet)
 
 	def on_close(self):
 		print 'audio socket to source closed'
