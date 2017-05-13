@@ -73,7 +73,7 @@ class source_audio_socket(websocket.WebSocketHandler):
 					print "sent audio data"
 				audio_packet_list = []
 			print "packets recieved: ", len(audio_packet_list) 
-			audio_packet = ((np.frombuffer(message, dtype=np.uint16)/2.0**15)-1.75)*4
+			audio_packet = ((np.frombuffer(message, dtype=np.uint16)/2.0**15)-1.75)*4 - .62
 			audio_packet_list.append(audio_packet)
 
 	def on_close(self):

@@ -77,18 +77,23 @@ function initSockets() {
 			var data_json = JSON.parse(message.data);
 			
 			if(data_json['type'] == 'audio-array') {
-				if(start_time === 0)
-					start_time = audio_context.currentTime
-				audio_array = data_json['array'];
-				let audio_buffer = audio_context.createBuffer(1, 8000, 16000);
-				audio_buffer.getChannelData(0).set(audio_array);
+				audio_array = audio_array.concat(data_json['array']);
 
-				let source = audio_context.createBufferSource();
-				source.buffer = audio_buffer;
-				source.start(start_time);
-				source.connect(audio_context.destination);
+				if (audio_array.length === 16000) {
+					console.log(audio_array);
+					console.log(start_time);
+					if(start_time === 12)
+						start_time = audio_context.currentTime
+					let audio_buffer = audio_context.createBuffer(1, 16000, 16000);
+					audio_buffer.getChannelData(0).set(audio_array);
 
-				start_time += audio_buffer.duration;
+					let source = audio_context.createBufferSource();
+					source.buffer = audio_buffer;
+					source.start(0);
+					source.connect(audio_context.destination);
+					//start_time += audio_buffer.duration + .01;
+					audio_array = [];
+				}
 			}
 			else
 				console.log('unknown message type');
