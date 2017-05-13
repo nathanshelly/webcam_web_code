@@ -8,6 +8,7 @@ var img = document.getElementById('pic');
 var start_time = 0;
 var audio_context = new AudioContext();
 var audio_array = [];
+var audio_buffer_size = 16000;
 
 // Initialize sockets
 function initSockets() {
@@ -49,23 +50,6 @@ function initSockets() {
 
 	aud_socket.onopen = function () { 
 		console.log('Audio socket open');
-	/*	var audio_context = new AudioContext();
-		let start_time = 0;
-		let audio_array = [];
-		for(let i = 0; i < 16000; i++) {
-			audio_array.push(20*Math.sin(2*Math.PI*440 * (i/16000)));
-		}
-		 for(let j = 0; j < 5; j++) {
-			let audio_buffer = audio_context.createBuffer(1, 16000, 16000);
-			audio_buffer.getChannelData(0).set(audio_array);
-
-			let source = audio_context.createBufferSource();
-			source.buffer = audio_buffer;
-			source.start(start_time);
-			source.connect(audio_context.destination);
-
-			start_time += audio_buffer.duration;
-		}*/
 	};
 
 	aud_socket.onclose = function () { 
@@ -79,19 +63,14 @@ function initSockets() {
 			if(data_json['type'] == 'audio-array') {
 				audio_array = audio_array.concat(data_json['array']);
 
-				if (audio_array.length === 16000) {
-					console.log(audio_array);
-					console.log(start_time);
-					if(start_time === 12)
-						start_time = audio_context.currentTime
-					let audio_buffer = audio_context.createBuffer(1, 16000, 16000);
+				if (audio_array.length === audio_buffer_size) {
+					let audio_buffer = audio_context.createBuffer(1, audio_buffer_size, 16000);
 					audio_buffer.getChannelData(0).set(audio_array);
 
 					let source = audio_context.createBufferSource();
 					source.buffer = audio_buffer;
-					source.start(0);
+					source.start();
 					source.connect(audio_context.destination);
-					//start_time += audio_buffer.duration + .01;
 					audio_array = [];
 				}
 			}
@@ -103,7 +82,6 @@ function initSockets() {
 
 	aud_socket.onerror = function () {
 		aud_socket.close();
-		// placeholder
 		console.log('Audio socket error');
 	};
 }
@@ -119,38 +97,6 @@ function displayImage() {
     //*** Set the source of the image to the image on the WiFi chip ***//
 	var d = new Date();	
 	img.src = 'images/cam_feed.jpg' + '?dummy=' + d.getTime();
-}
-
-function writeString(view, offset, string){
-	for (var i  = 0; i < string.length; i++){
-		view.setUint8(offset+i, string.charCodeAt(i));
-	}
-}
-
-function encodeWAV(samples){
-	var buffer = new ArrayBuffer(44 + samples.length *2);
-	var view = new DataView(buffer);
-	sample_rate = 16000;
-
-	writeString(view, 0, 'RIFF');
-	view.setUint32(4, 36+samples.length*2,true);
-	writeString(view, 8, 'WAVE');
-	writeString(view, 12, 'fmt ');
-	view.setUint32(16, 16, true);
-	view.setUint16(20, 1, true);
-	view.setUint16(22, 1, true);
-	view.setUint32(24, sample_rate, true);
-	view.setUint32(28, sample_rate*4, true);
-	view.setUint16(32, 2, true);
-	view.setUint16(34, 16, true);
-	writeString(view, 36, 'data');
-	view.setUint32(40, samples.length*2, true);
-	var offset = 44;
-	for (var i=0; i< samples.length; i++, offset += 2){
-		view.setInt16(offset, samples[i], true);
-	}
-
-	return view;
 }
 
 // Set up event listeners

@@ -8,7 +8,7 @@ cam_sockets = []
 browser_audio_sockets = []
 audio_packet_list = [] # list of numpy arrays of chunk size
 
-class cam_socket(websocket.WebSocketHandler):    
+class cam_socket(websocket.WebSocketHandler): 
 	def check_origin(self, origin):
 		return True
 
@@ -30,15 +30,8 @@ class aud_socket(websocket.WebSocketHandler):
 		return True
 
 	def open(self):
-		print 'audio stream opened'
 		browser_audio_sockets.append(self)
-		a = np.fromfile('temp.bin', dtype=np.int16)[:800]
-		a = np.concatenate((a,a,a,a,a,a))
-		a = np.concatenate((a,a,a,a,a,a))
-		print len(a)
-		to_send = {'type':'audio-array', 'array': a.tolist()}
-		# self.write_message(json.dumps(to_send))
-		print "Sent audio data"
+		print 'audio stream opened'
 
 	def on_message(self, message):
 		if message:
@@ -48,6 +41,22 @@ class aud_socket(websocket.WebSocketHandler):
 	def on_close(self):
 		browser_audio_sockets.remove(self)
 		print 'audio stream closed'
+
+class source_cam_socket(websocket.WebSocketHandler):    
+	def check_origin(self, origin):
+		return True
+
+	def open(self):
+		print 'camera stream to source opened'
+
+	def on_message(self, message):
+		if message:
+			message = json.loads(message)
+			print message
+
+	def on_close(self):
+		cam_sockets.remove(self)
+		print 'camera stream to source closed'
 
 class source_audio_socket(websocket.WebSocketHandler):
 	def check_origin(self, origin):
