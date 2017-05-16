@@ -11,6 +11,7 @@ camera_packet_list = []
 #filename1 = "images/cam_feed1.jpg"
 #filename2 = "images/cam_feed2.jpg"
 writing_file_1 = True
+image_base_64 = ""
 
 
 class cam_socket(websocket.WebSocketHandler): 
@@ -65,8 +66,6 @@ class source_cam_socket(websocket.WebSocketHandler):
 	f.write("")
 	f.close()
 
-	#writing_file_1 = True
-
 	def check_origin(self, origin):
 		return True
 
@@ -75,35 +74,42 @@ class source_cam_socket(websocket.WebSocketHandler):
 		#f = open("images/cam_feed.jpg","ab")
 
 	def on_message(self, message):
-                global writing_file_1
+		global writing_file_1, image_base_64
 		if message:
-                        #print "Image packet received of length ", len(message)
-                        print "Image data packet received"
-                        if writing_file_1:
+			image_base_64 += base64.b64encode(message)
+			
+			print "Image packet received of length ", len(message)
+			print repr(message)
+			print base64.b64encode(message)
+			
+
+			if writing_file_1:
 				filename = "images/cam_feed1.jpg"
 			else:
 				filename = "images/cam_feed2.jpg"
 			f = open(filename,"ab")
 			f.write(message)
 			f.close()
-                        #print message.encode('hex')
-                else:
-                        print "Full image received"
+		else:
+			print "Full image received"
 			if writing_file_1:
 				filename = "images/cam_feed1.jpg"
 				writing_file_1 = False
-                                f = open("images/cam_feed2.jpg", "w")
-                                f.write("")
-                                f.close()
+				f = open("images/cam_feed2.jpg", "w")
+				f.write("")
+				f.close()
 			else:
 				filename = "images/cam_feed2.jpg"
 				writing_file_1 = True
-                                f = open("images/cam_feed1.jpg", "w")
-                                f.write("")
-                                f.close()
-                        print "File size", os.stat(filename).st_size
+				f = open("images/cam_feed1.jpg", "w")
+				f.write("")
+				f.close()
+			print "File size", os.stat(filename).st_size
 			for websocket in cam_sockets:
-				websocket.write_message(filename)
+				# websocket.write_message(filename)
+				websocket.write_message(image_base_64)
+			
+			image_base_64 = ""
 
 	def on_close(self):
 		print 'camera stream to source closed'
