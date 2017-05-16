@@ -35,12 +35,12 @@ function initSockets() {
         document.getElementById('timestamp').innerHTML = 'No current image';
     };
 
-    cam_socket.onmessage = function (event) {
+    cam_socket.onmessage = function (message) {
         document.getElementById('timestamp').innerHTML = Date();
 				console.log(event);
-
+	
         // Display the image!
-        displayImage();
+        displayImage(message.data);
     };
 
 	cam_socket.onerror = function () {
@@ -93,10 +93,11 @@ function logAndUpdateButton(new_log_msg, new_btn_txt, new_btn_title, btn_status)
 		b.disabled = btn_status;
 }
 
-function displayImage() {
+function displayImage(filename) {
     //*** Set the source of the image to the image on the WiFi chip ***//
-	var d = new Date();	
-	img.src = 'images/cam_feed.jpg' + '?dummy=' + d.getTime();
+    var d = new Date();
+    console.log(filename)
+    img.src = filename + '?dummy=' + d.getTime();
 }
 
 // Set up event listeners
