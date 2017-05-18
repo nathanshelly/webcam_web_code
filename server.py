@@ -76,40 +76,7 @@ class source_cam_socket(websocket.WebSocketHandler):
 	def on_message(self, message):
 		global writing_file_1, image_base_64
 		if message:
-			image_base_64 += base64.b64encode(message)
-			
-			print "Image packet received of length ", len(message)
-			print repr(message)
-			print base64.b64encode(message)
-			
-
-			if writing_file_1:
-				filename = "images/cam_feed1.jpg"
-			else:
-				filename = "images/cam_feed2.jpg"
-			f = open(filename,"ab")
-			f.write(message)
-			f.close()
-		else:
-			print "Full image received"
-			if writing_file_1:
-				filename = "images/cam_feed1.jpg"
-				writing_file_1 = False
-				f = open("images/cam_feed2.jpg", "w")
-				f.write("")
-				f.close()
-			else:
-				filename = "images/cam_feed2.jpg"
-				writing_file_1 = True
-				f = open("images/cam_feed1.jpg", "w")
-				f.write("")
-				f.close()
-			print "File size", os.stat(filename).st_size
-			for websocket in cam_sockets:
-				# websocket.write_message(filename)
-				websocket.write_message(image_base_64)
-			
-			image_base_64 = ""
+                        print "oops"
 
 	def on_close(self):
 		print 'camera stream to source closed'
@@ -123,23 +90,59 @@ class source_audio_socket(websocket.WebSocketHandler):
 		global audio_packet_list
 		audio_packet_list = []
 
-	def on_message(self, message):
+        def on_message(self, message):
+                global audio_packet_list, writing_file_1, image_base_64
 		if message:
-			global audio_packet_list
+                        print "Packet received of length", len(message)
+                        #global audio_packet_list
+                        if len(message) == 400: # it's an audio packet
+                                #print "audio packet received"
 
-			if len(audio_packet_list) == 40:
-				print "received termination request"
-				print str(datetime.now())
-				audio_array = np.concatenate(audio_packet_list)
+                                if len(audio_packet_list) == 40:
+				        print "received audio termination request"
+				        print str(datetime.now())
+				        audio_array = np.concatenate(audio_packet_list)
 
-				to_send = {'type': 'audio-array','array': audio_array.tolist()}
-				for socket in browser_audio_sockets:
-					socket.write_message(json.dumps(to_send))
-					print "sent audio data"
-				audio_packet_list = []
-			print "packets recieved: ", len(audio_packet_list) 
-			audio_packet = ((np.frombuffer(message, dtype=np.uint16)/2.0**15)-1.75)*4 - .62
-			audio_packet_list.append(audio_packet)
+				        to_send = {'type': 'audio-array','array': audio_array.tolist()}
+				        for socket in browser_audio_sockets:
+					        socket.write_message(json.dumps(to_send))
+					        print "sent audio data"
+				        audio_packet_list = []
+			        print "packets recieved: ", len(audio_packet_list) 
+			        audio_packet = ((np.frombuffer(message, dtype=np.uint16)/2.0**15)-1.75)*4 - .62
+			        audio_packet_list.append(audio_packet)
+                        else: # it's an image packet - the audio ones are always exactly 200 long
+                                if message == "image done":
+				        print "Full image received"
+				        if writing_file_1:
+					        filename = "images/cam_feed1.jpg"
+					        writing_file_1 = False
+					        f = open("images/cam_feed2.jpg", "w")
+					        f.write("")
+					        f.close()
+				        else:
+					        filename = "images/cam_feed2.jpg"
+					        writing_file_1 = True
+					        f = open("images/cam_feed1.jpg", "w")
+					        f.write("")
+					        f.close()
+				        print "File size", os.stat(filename).st_size
+				        for websocket in cam_sockets:
+				                websocket.write_message(filename)
+					# websocket.write_message(image_base_64)
+				        
+				        image_base_64 = ""
+
+			        else:
+				        image_base_64 += base64.b64encode(message)
+                                        if writing_file_1:
+					        filename = "images/cam_feed1.jpg"
+				        else:
+					        filename = "images/cam_feed2.jpg"
+				        f = open(filename,"ab")
+				        f.write(message)
+				        f.close()
+                                                
 
 	def on_close(self):
 		print 'audio socket to source closed'

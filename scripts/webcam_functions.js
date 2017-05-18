@@ -40,7 +40,8 @@ function initSockets() {
 				// console.log(event);
 	
         // Display the image!
-        displayImageWebsockets(message.data);
+        //displayImageWebsockets(message.data);
+	displayImage(message.data);
     };
 
 	cam_socket.onerror = function () {
