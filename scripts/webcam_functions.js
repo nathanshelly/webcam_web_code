@@ -7,8 +7,6 @@ var b = document.getElementById('btnWS');
 var img = document.getElementById('pic');
 var start_time = 0;
 var audio_context = new AudioContext();
-var audio_array = [];
-var audio_buffer_size = 16000;
 
 // Initialize sockets
 function initSockets() {
@@ -62,21 +60,18 @@ function initSockets() {
 			var data_json = JSON.parse(message.data);
 			
 			if(data_json['type'] == 'audio-array') {
-				audio_array = audio_array.concat(data_json['array']);
+			    var audio_array = data_json['array'];
+			    let audio_buffer = audio_context.createBuffer(1, audio_array.length, 16000);
+			    audio_buffer.getChannelData(0).set(audio_array);
 
-				if (audio_array.length === audio_buffer_size) {
-					let audio_buffer = audio_context.createBuffer(1, audio_buffer_size, 16000);
-					audio_buffer.getChannelData(0).set(audio_array);
-
-					let source = audio_context.createBufferSource();
-					source.buffer = audio_buffer;
-					source.start();
-					source.connect(audio_context.destination);
-					audio_array = [];
-				}
+			    let source = audio_context.createBufferSource();
+			    source.buffer = audio_buffer;
+			    source.start();
+			    source.connect(audio_context.destination);
+			    audio_array = [];
 			}
 			else
-				console.log('unknown message type');
+			    console.log('unknown message type');
 		}
 		console.log('Audio socket message');
 	};

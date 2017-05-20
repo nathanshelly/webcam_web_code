@@ -98,7 +98,7 @@ class source_audio_socket(websocket.WebSocketHandler):
                         if len(message) == 400: # it's an audio packet
                                 #print "audio packet received"
 
-                                if len(audio_packet_list) == 40:
+                                if len(audio_packet_list) == 20:
 				        print "received audio termination request"
 				        print str(datetime.now())
 				        audio_array = np.concatenate(audio_packet_list)
@@ -108,8 +108,14 @@ class source_audio_socket(websocket.WebSocketHandler):
 					        socket.write_message(json.dumps(to_send))
 					        print "sent audio data"
 				        audio_packet_list = []
-			        print "packets recieved: ", len(audio_packet_list) 
-			        audio_packet = ((np.frombuffer(message, dtype=np.uint16)/2.0**15)-1.75)*4 - .62
+			        print "packets recieved: ", len(audio_packet_list)
+                                audio_packet_raw = np.frombuffer(message, dtype=np.uint16)
+                                #f_stat = open("stored_audio_data.csv","ab")
+                                #for datapoint in audio_packet_raw:
+                                #        f_stat.write(str(datapoint) + "\r\n")
+                                #f_stat.close()
+			        audio_packet = ((np.frombuffer(message, dtype=np.uint16) - 62473.0)/3203.0)
+                                #print audio_packet
 			        audio_packet_list.append(audio_packet)
                         else: # it's an image packet - the audio ones are always exactly 200 long
                                 if message == "image done":
