@@ -12,6 +12,7 @@ camera_packet_list = []
 #filename2 = "images/cam_feed2.jpg"
 writing_file_1 = True
 image_base_64 = ""
+adaptive_buffer = np.zeros(1000) # 1000 samples for adaptive conversion
 
 
 class cam_socket(websocket.WebSocketHandler): 
@@ -48,40 +49,7 @@ class aud_socket(websocket.WebSocketHandler):
 		browser_audio_sockets.remove(self)
 		print 'audio stream closed'
 
-class post_image(tornado.web.RequestHandler):
-	def post(self):
-		body = self.request.body
-		if self.request.headers["message-type"] == "image-bin":
-			print 'got image'
-			f = open("images/cam_feed.jpg","wb")
-			f.write(body)
-			f.close()
-			for websocket in cam_sockets:
-				websocket.write_message('hi')
-		else:
-			print "No image sent"
-
-class source_cam_socket(websocket.WebSocketHandler):
-	f = open("images/cam_feed.jpg","wb")
-	f.write("")
-	f.close()
-
-	def check_origin(self, origin):
-		return True
-
-	def open(self):
-		print 'camera stream to source opened'
-		#f = open("images/cam_feed.jpg","ab")
-
-	def on_message(self, message):
-		global writing_file_1, image_base_64
-		if message:
-                        print "oops"
-
-	def on_close(self):
-		print 'camera stream to source closed'
-
-class source_audio_socket(websocket.WebSocketHandler):
+class source_socket(websocket.WebSocketHandler):
 	def check_origin(self, origin):
 		return True
 
@@ -91,18 +59,16 @@ class source_audio_socket(websocket.WebSocketHandler):
 		audio_packet_list = []
 
         def on_message(self, message):
-                global audio_packet_list, writing_file_1, image_base_64
+                global audio_packet_list, writing_file_1, image_base_64, adaptive_buffer
 		if message:
-                        print "Packet received of length", len(message)
+                        #print "Packet received of length", len(message)
                         #global audio_packet_list
                         if len(message) == 400: # it's an audio packet
-                                #print "audio packet received"
-
+                                print "audio packet received"
                                 if len(audio_packet_list) == 20:
 				        print "received audio termination request"
 				        print str(datetime.now())
 				        audio_array = np.concatenate(audio_packet_list)
-
 				        to_send = {'type': 'audio-array','array': audio_array.tolist()}
 				        for socket in browser_audio_sockets:
 					        socket.write_message(json.dumps(to_send))
@@ -114,7 +80,16 @@ class source_audio_socket(websocket.WebSocketHandler):
                                 #for datapoint in audio_packet_raw:
                                 #        f_stat.write(str(datapoint) + "\r\n")
                                 #f_stat.close()
-			        audio_packet = ((np.frombuffer(message, dtype=np.uint16) - 62473.0)/3203.0)
+                                #print "Raw audio packet"
+                                #print audio_packet_raw
+                                adaptive_buffer = np.roll(adaptive_buffer, 200)
+                                adaptive_buffer[0:200] = audio_packet_raw
+                                adaptive_mean = np.mean(adaptive_buffer)
+                                #print "Adaptive mean", adaptive_mean
+                                adaptive_std = np.std(adaptive_buffer)
+                                #print "Adaptive dev", adaptive_std
+			        audio_packet = ((np.frombuffer(message, dtype=np.uint16) - adaptive_mean)/adaptive_std)# 62473.0)/3203.0)
+                                audio_packet = np.clip(audio_packet, -1, 1)
                                 #print audio_packet
 			        audio_packet_list.append(audio_packet)
                         else: # it's an image packet - the audio ones are always exactly 200 long
@@ -140,6 +115,7 @@ class source_audio_socket(websocket.WebSocketHandler):
 				        image_base_64 = ""
 
 			        else:
+                                        print "Image packet received"
 				        image_base_64 += base64.b64encode(message)
                                         if writing_file_1:
 					        filename = "images/cam_feed1.jpg"
@@ -150,11 +126,12 @@ class source_audio_socket(websocket.WebSocketHandler):
 				        f.close()
                                                 
 
+                                        
 	def on_close(self):
 		print 'audio socket to source closed'
 
 def make_app():
-	handlers = [(r"/camera_socket", cam_socket), (r"/audio_socket", aud_socket), (r"/source_audio_socket", source_audio_socket), (r"/source_cam_socket", source_cam_socket), (r"/post_image", post_image)]
+	handlers = [(r"/camera_socket", cam_socket), (r"/audio_socket", aud_socket), (r"/source_socket", source_socket)]#, (r"/source_cam_socket", source_cam_socket), (r"/post_image", post_image)]
 	return tornado.web.Application(handlers)
 
 if __name__ == "__main__":
