@@ -1,8 +1,3 @@
-body {
-    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-    margin: 0px;
-}
-
 .container {
     margin: 10%;
     width: 95%;
@@ -17,8 +12,10 @@ body {
     float: left;
 }
 
-.col3 {
+p {
+    padding: 20px;
     margin: auto;
+    width: 250px;
 }
 
 @media screen and (max-width:680px) {

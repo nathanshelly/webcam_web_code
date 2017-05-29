@@ -1,17 +1,13 @@
-body {
-    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-    margin: 0px;
-}
-
 .container {
     margin: 10px;
 }
 
 #log {
-    max-width: 425px;
+    max-width: 300px;
     border: 1px solid #CCCCCC;
     border-radius: 5px;
-    padding: 5px;
+    padding: 15px;
+    margin: auto;
 }
 
 h1 {
@@ -35,9 +31,11 @@ p {
 }
 
 #btnWS {
+    background-color: white;
+/*    border: 1px solid #CCCCCC;*/
     position: relative;
     border: none;
-    color: #FFFFFF;
+    color: black;
     padding: 20px;
     text-align: center;
     transition-duration: 0.4s;
@@ -45,13 +43,15 @@ p {
     overflow: hidden;
     cursor: pointer;
     margin: 10px 0;
+    border-radius: 5px;
 }
 
 .icon {
     display: list-item;
 }
 
+/*
 #btnWS:hover {
-    /*background-color: #3e8e41;*/
+    background-color: #3e8e41;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-}
+}*/

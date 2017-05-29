@@ -1,6 +1,15 @@
 /*Navbar Code*/
 
 /* When the screen is less than 680 pixels wide, hide all list items, except for the first one ("Home"). Show the list item that contains the link to open and close the topnav (li.icon) */
+
+body {
+    font-family: "Helvetica";
+    margin: 0px;
+    background: black;
+    color: white;
+    text-align: center;
+}
+
 @media screen and (max-width:680px) {
   ul.topnav li:not(:first-child) {display: none;}
   ul.topnav li.icon {

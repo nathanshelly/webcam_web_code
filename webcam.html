@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam</title>
-    <link href="/styles/webcam_styles.css" rel="stylesheet" type="text/css">
-    <link href="/styles/navbar_styles.css" rel="stylesheet" type="text/css">
+    <title>Live Feed</title>
+    <link href="styles/webcam_styles.css" rel="stylesheet" type="text/css">
+    <link href="styles/navbar_styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -14,9 +14,9 @@
    <!--   Navbar Code -->
    
     <ul class="topnav" id="myTopnav">
-        <li><a href="/index">Home</a></li>
-        <li><a href="/info">About</a></li>
-        <li><a href="/webcam">Webcam</a></li>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="info.html">About</a></li>
+        <li><a href="webcam.html">Feed</a></li>
         <li class="icon"> <a href="javascript:void(0);" onclick="toggle_responsive_class()">&#9776;</a> </li>
     </ul>
     
@@ -24,15 +24,14 @@
    
     <div class="container">
         <h1>Big Brother Live Feed</h1> 
-	<h3>Audio Stream</h3>
 	<ul id="recordings_list"></ul>
         <div>
-            <img id="pic" src="/images/big_brother_placeholder.png" alt="My webcam image" width="640" height="480">
+            <img id="pic" src="images/white%20on%20black.png" alt="My webcam image" width="250" height="">
         </div>
-        <div><button id="btnWS" title="Click to start webcam">Start Webcam</button></div>
-        <h3>Image last updated: </h3>
-        <p id="timestamp">No current image</p>
-        <h3>Log</h3>
+        <div><button id="btnWS" title="Click to start webcam">Start Feed</button></div>
+<!--        <h3>Image last updated: </h3>-->
+<!--        <p id="timestamp">No current image</p>-->
+
         <div id="log">&nbsp;</div>
     </div>
     <script src="/scripts/all_pages_functions.js"></script>
