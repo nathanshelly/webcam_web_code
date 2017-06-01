@@ -22,6 +22,7 @@ class cam_socket(websocket.WebSocketHandler):
 	def open(self):
 		cam_sockets.append(self)
 		print 'camera stream opened'
+                #self.write_message()
 
 	def on_message(self, message):
 		if message:
@@ -65,7 +66,7 @@ class source_socket(websocket.WebSocketHandler):
                         #global audio_packet_list
                         if len(message) == 400: # it's an audio packet
                                 print "audio packet received"
-                                if len(audio_packet_list) == 20:
+                                if len(audio_packet_list) == 50:
 				        print "received audio termination request"
 				        print str(datetime.now())
 				        audio_array = np.concatenate(audio_packet_list)
@@ -88,8 +89,8 @@ class source_socket(websocket.WebSocketHandler):
                                 #print "Adaptive mean", adaptive_mean
                                 adaptive_std = np.std(adaptive_buffer)
                                 #print "Adaptive dev", adaptive_std
-			        audio_packet = ((np.frombuffer(message, dtype=np.uint16) - adaptive_mean)/adaptive_std)# 62473.0)/3203.0)
-                                audio_packet = np.clip(audio_packet, -1, 1)
+			        audio_packet = ((np.frombuffer(message, dtype=np.uint16) - 62473.0)/3203.0)
+                                #audio_packet = np.clip(audio_packet, -1, 1)
                                 #print audio_packet
 			        audio_packet_list.append(audio_packet)
                         else: # it's an image packet - the audio ones are always exactly 200 long
@@ -131,7 +132,7 @@ class source_socket(websocket.WebSocketHandler):
 		print 'audio socket to source closed'
 
 def make_app():
-	handlers = [(r"/camera_socket", cam_socket), (r"/audio_socket", aud_socket), (r"/source_socket", source_socket)]#, (r"/source_cam_socket", source_cam_socket), (r"/post_image", post_image)]
+	handlers = [(r"/camera_socket", cam_socket), (r"/audio_socket", aud_socket), (r"/source_socket", source_socket)]
 	return tornado.web.Application(handlers)
 
 if __name__ == "__main__":

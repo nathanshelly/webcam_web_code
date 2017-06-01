@@ -21,25 +21,18 @@ function initSockets() {
 
     cam_socket.onopen = function () {
 				logAndUpdateButton('Sockets open to ' + host_url, 'Stop webcam', 'Click to stop webcam', false);
-
-        // display image!
-        displayImage();
     };
 
     cam_socket.onclose = function () {
 				logAndUpdateButton('Sockets to ' + host_url + ' closed', 'Start webcam', 'Click to start webcam', false);
-
         img.src = 'images/big_brother_placeholder.png';
-        document.getElementById('timestamp').innerHTML = 'No current image';
     };
 
     cam_socket.onmessage = function (message) {
-        document.getElementById('timestamp').innerHTML = Date();
-				// console.log(event);
-	
         // Display the image!
         //displayImageWebsockets(message.data);
-	displayImage(message.data);
+				console.log(message.data);
+				displayImage(message.data);
     };
 
 	cam_socket.onerror = function () {
@@ -89,13 +82,6 @@ function logAndUpdateButton(new_log_msg, new_btn_txt, new_btn_title, btn_status)
 		b.disabled = btn_status;
 }
 
-function displayImageWebsockets(filename) {
-    //*** Set the source of the image to the image on the WiFi chip ***//
-    var d = new Date();
-    console.log(filename)
-    img.src = "data:image/jpg;base64," + filename;
-}
-
 function displayImage(filename) {
     //*** Set the source of the image to the image on the WiFi chip ***//
     var d = new Date();
@@ -106,8 +92,14 @@ function displayImage(filename) {
 // Set up event listeners
 //*** When the button is clicked, disable it, and depending on whether a Websocket is open or not, either run "initSockets()" or "cam_socket.close()" ***//
 b.onclick = function () {
-    b.disabled = true;
-    cam_socket.readyState === ws.OPEN ? ws.close() : initSockets();    
+	b.disabled = true;
+	if(cam_socket.readyState === cam_socket.OPEN && cam_socket.readyState === cam_socket.OPEN) {
+		cam_socket.close();
+		aud_socket.close();
+	}
+	else {
+		initSockets();
+	}
 }
 
 // Other functions
