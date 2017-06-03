@@ -1,6 +1,6 @@
 *.swp
 *.save
 *~
-cam_feed*.jpg
+cam_feed*
 #server*
 temp.bin
