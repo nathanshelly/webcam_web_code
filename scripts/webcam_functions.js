@@ -25,7 +25,7 @@ function initSockets() {
 
     cam_socket.onclose = function () {
 				logAndUpdateButton('Sockets to ' + host_url + ' closed', 'Start webcam', 'Click to start webcam', false);
-        img.src = 'images/big_brother_placeholder.png';
+        img.src = 'images/white on black.png';
     };
 
     cam_socket.onmessage = function (message) {
