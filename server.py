@@ -12,7 +12,8 @@ camera_packet_list = []
 #filename2 = "images/cam_feed2.jpg"
 writing_file_1 = True
 image_base_64 = ""
-adaptive_buffer = np.zeros(1000) # 1000 samples for adaptive conversion
+num_packets_adaptive = 80*15
+adaptive_buffer = np.random.randn(num_packets_adaptive*200)*3203.0 + 62473 # samples for adaptive conversion
 
 
 class cam_socket(websocket.WebSocketHandler): 
@@ -66,7 +67,7 @@ class source_socket(websocket.WebSocketHandler):
                         #global audio_packet_list
                         if len(message) == 400: # it's an audio packet
                                 print "audio packet received"
-                                if len(audio_packet_list) == 50:
+                                if len(audio_packet_list) == 25:
 				        print "received audio termination request"
 				        print str(datetime.now())
 				        audio_array = np.concatenate(audio_packet_list)
@@ -89,8 +90,8 @@ class source_socket(websocket.WebSocketHandler):
                                 #print "Adaptive mean", adaptive_mean
                                 adaptive_std = np.std(adaptive_buffer)
                                 #print "Adaptive dev", adaptive_std
-			        audio_packet = ((np.frombuffer(message, dtype=np.uint16) - 62473.0)/3203.0)
-                                #audio_packet = np.clip(audio_packet, -1, 1)
+			        audio_packet = ((np.frombuffer(message, dtype=np.uint16) - adaptive_mean)/(10.0*adaptive_std))#62473.0)/3203.0)
+                                audio_packet = np.clip(audio_packet, -1, 1)
                                 #print audio_packet
 			        audio_packet_list.append(audio_packet)
                         else: # it's an image packet - the audio ones are always exactly 200 long
