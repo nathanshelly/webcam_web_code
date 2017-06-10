@@ -8,7 +8,6 @@ cam_sockets = []
 audio_packet_list = [] # list of numpy arrays of chunk size
 browser_audio_sockets = []
 writing_file_1 = True
-image_base_64 = ""
 packet_size = 200
 num_packets_adaptive = 80*5
 
@@ -58,9 +57,10 @@ class source_socket(websocket.WebSocketHandler):
 		audio_packet_list = []
 
 	def on_message(self, message):
-		global audio_packet_list, writing_file_1, image_base_64, adaptive_buffer
+		global audio_packet_list, writing_file_1, adaptive_buffer
 		if message:
-			if len(message) == 400: # it's an audio packet
+			if len(message) == 400: 
+				# it's an audio packet	
 				print "audio packet received"
 
 				if len(audio_packet_list) == 25:
@@ -90,30 +90,23 @@ class source_socket(websocket.WebSocketHandler):
 				# it's an image packet - the audio ones are always exactly 200 long
 				if message == "image done":
 					print "Full image received"
-					if writing_file_1:
-						filename = "images/cam_feed1.jpg"
-						writing_file_1 = False
-						f = open("images/cam_feed2.jpg", "w")
-						f.write("")
-						f.close()
-					else:
-						filename = "images/cam_feed2.jpg"
-						writing_file_1 = True
-						f = open("images/cam_feed1.jpg", "w")
-						f.write("")
-						f.close()
-					print "File size", os.stat(filename).st_size
-					for websocket in cam_sockets:
-						websocket.write_message(filename)
+					complete_image = 'images/cam_feed1.jpg' if writing_file_1 else 'images/cam_feed2.jpg'
+					new_image = 'images/cam_feed2.jpg' if writing_file_1 else 'images/cam_feed1.jpg'
+
+					f = open(new_image, 'w')
+					f.write('')
+					f.close()
 					
-					image_base_64 = ""
+					writing_file_1 = not writing_file_1
+
+					print "File size", os.stat(complete_image).st_size
+					for websocket in cam_sockets:
+						websocket.write_message(complete_image)
+					
 				else:
 					print "Image packet received"
-					image_base_64 += base64.b64encode(message)
-					if writing_file_1:
-						filename = "images/cam_feed1.jpg"
-					else:
-						filename = "images/cam_feed2.jpg"
+					filename = 'images/cam_feed1.jpg' if writing_file_1 else 'images/cam_feed2.jpg'
+
 					f = open(filename,"ab")
 					f.write(message)
 					f.close()
