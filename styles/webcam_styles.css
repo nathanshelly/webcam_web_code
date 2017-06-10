@@ -25,14 +25,13 @@ p {
 }
 
 #pic {
-    padding: '10%';
-    width='90%';
-    height='auto';
+    width: auto;
+    height: auto;
+    padding: 10%;
 }
 
 #btnWS {
     background-color: white;
-/*    border: 1px solid #CCCCCC;*/
     position: relative;
     border: none;
     color: black;
@@ -49,9 +48,3 @@ p {
 .icon {
     display: list-item;
 }
-
-/*
-#btnWS:hover {
-    background-color: #3e8e41;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-}*/

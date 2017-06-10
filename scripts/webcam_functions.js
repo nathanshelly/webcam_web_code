@@ -121,11 +121,7 @@ function showLog(logArray, logId, logLimit) {
 // Define initialization function
 function init() {
     initSockets();
-    adjust_image_width('#pic');
-    img.style.width = '95%';
-    img.style.height = 'auto';
 }
 
 // Open Websocket as soon as page loads
 window.onload = init;
-window.addEventListener('resize', adjust_image_width('#pic'));
