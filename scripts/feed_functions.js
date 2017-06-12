@@ -20,11 +20,11 @@ function initSockets() {
     aud_socket = new WebSocket('wss://' + host_url + '/audio_socket');
 
     cam_socket.onopen = function () {
-				logAndUpdateButton('Sockets open to ' + host_url, 'Stop webcam', 'Click to stop webcam', false);
+				logAndUpdateButton('Sockets open to ' + host_url, 'Stop feed', 'Click to stop feed', false);
     };
 
     cam_socket.onclose = function () {
-				logAndUpdateButton('Sockets to ' + host_url + ' closed', 'Start webcam', 'Click to start webcam', false);
+				logAndUpdateButton('Sockets to ' + host_url + ' closed', 'Start feed', 'Click to start feed', false);
         img.src = 'images/white_on_black.png';
     };
 
@@ -34,7 +34,7 @@ function initSockets() {
 
 	cam_socket.onerror = function () {
 		cam_socket.close();
-		logAndUpdateButton('Websocket error', 'Start webcam', 'Click to start webcam', false);
+		logAndUpdateButton('Websocket error', 'Start feed', 'Click to start feed', false);
 	};
 
 	aud_socket.onopen = function () { 
